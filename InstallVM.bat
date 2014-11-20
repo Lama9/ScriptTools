@@ -13,14 +13,14 @@ goto err
 
 :Install_Vmc
 echo "install VMC"
-set apkfpath=%DailyBuildPath%.Vidonme_mediacenter\Lite_release\
+set apkfpath=%DailyBuildPath%.\Vidonme_mediacenter\Lite_release\
 adb uninstall org.vidonme.mediacenter
 goto installapk
 
 
 :Install_vmc_debug
 echo "Install VMC Debug"
-set apkfpath=%DailyBuildPath%.Vidonme_mediacenter\Lite\
+set apkfpath=%DailyBuildPath%.\Vidonme_mediacenter\Lite\
 adb uninstall org.vidonme.mediacenter
 goto installapk
 
