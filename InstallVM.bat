@@ -42,12 +42,12 @@ goto installapk
 
 :installapk
 @echo off
-for /f "delims=" %%a in ('dir /b /od %apkfpath%') do (
+for /f "delims=" %%a in ('dir /b /od /A-D %apkfpath%') do (
     set filename=%%a
 )
 echo %apkfpath%%filename%
 rem pause
-adb install %apkfpath%%filename%
+adb install -r %apkfpath%%filename%
 goto end
 
 
