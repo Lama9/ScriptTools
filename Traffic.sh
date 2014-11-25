@@ -1,4 +1,5 @@
 #!/bin/bash
+#By Lama
 
 if [ -n "$1" ]; then
 eth_name=$1
