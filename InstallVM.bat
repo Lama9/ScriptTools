@@ -1,3 +1,4 @@
+rem By Lama
 
 @echo off
 adb connect 10.10.2.146
