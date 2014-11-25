@@ -1,5 +1,6 @@
 #!/bin/bash
 #Statistics for a specified user submitted the day the number of lines of code.
+#By Lama
 
 function count() {
     local insert=0
