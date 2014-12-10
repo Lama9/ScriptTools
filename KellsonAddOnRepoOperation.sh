@@ -83,9 +83,9 @@ function CheckSourceCodeFile(){
             cd ..
 #        fi
         
-        Count=`expr $Count + 1`
-        clear
-        echo "$Count/${#ZipsFolderList[@]}"
+#        Count=`expr $Count + 1`
+#        clear
+#        echo "$Count/${#ZipsFolderList[@]}"
     done
     
     cd ..
@@ -95,7 +95,9 @@ function CheckSourceCodeFile(){
 function GetAddOnVersion(){
     local AddOnXml=$1
     local AddOnVersion=($( grep  -o 'version=\([0-9,\.,\"]\+\)' "./addon.xml" | grep -o '\([0-9,\.]\+\)'));
-    return ${AddOnVersion[1]}
+#    echo ${#AddOnVersion[@]} "============" ${AddOnVersion[@]}  "-------" ${AddOnVersion[0]}
+    echo ${AddOnVersion[1]}
+#    return ${AddOnVersion[1]}
 }
 
 #检查是否所有的AddOn都有解压过的源码文件。如果没有则解压生成相应文件。
@@ -111,7 +113,7 @@ function CheckZipFile(){
     for TempUrl in ${ZipsFolderList[@]}
     do
         cd "$TempUrl"
-        local AddOnVersion=GetAddOnVersion
+        local AddOnVersion="$(GetAddOnVersion)"
         if [ [ ! -d "../Zips/$TempUrl" ] -o [ CheckDirIsEmpty "../Zips/$TempUrl" ] ]; then
             
             local ZipsFilesList=($(ls | grep -i '.zip') )
@@ -184,6 +186,8 @@ function CopyFileFromLocalGitHub(){
     cd ./LocalGitHubRepo/addons/
     git pull
     cp -f -R ./addons/repo/* ../.././AddOnRepo/Zips
+    rm -r -r ../.././AddOnRepo/Zips/repository.goland.addonsfortest
+    rm -r -r ../.././AddOnRepo/Repo/repository.goland.addonsfortest
     cd ../../
 }
 
@@ -193,9 +197,43 @@ function UnzipAddonFile(){
     cd ..
 }
 
+function CreatRepositoryCrazyAddonsZipFile(){
+    cd ./GitHubRepo/CrazyAddOns/
+    git pull
+    cd ./repository.Crazy.addons
+    local AddOnVersion="$(GetAddOnVersion)"
+    cd ..
+    zip -r "repository.Crazy.addons-$AddOnVersion.zip" "./repository.Crazy.addons"
+    mv -f "repository.Crazy.addons-$AddOnVersion.zip" "../../AddOnRepo/Zips/repository.Crazy.addons/"
+    ls ../../AddOnRepo/Zips/repository.Crazy.addons/
+    cd ../../
+}
 
-if [ -n $1 ]; then
+function ErrorMessage(){
+    echo "参数介绍"
+    echo "无参数            更新插件库列表，但不提交更新至外网github库"
+    echo "cr                重新生成Crazy库文件"
+    echo "pushpublic        提交更新至外网github库"
+    echo "updata            更新插件库列表，并提交更新至外网github库"
+}
+
+
+
+if [[ ! -n $1 ]]; then
+    echo "更新插件库列表，但不提交"
     CopyFileFromLocalGitHub
+    CreatRepositoryCrazyAddonsZipFile
+    UnzipAddonFile
+    CreatAddOnXMLFile "./AddOnRepo"
+    CopyFileToPublicGitHub
+    
+    cd "./GitHubRepo/CrazyAddOns/"
+    git status
+    cd ../../
+elif [ "$1" = "updata" ]; then
+    echo "更新插件库列表，并提交"
+    CopyFileFromLocalGitHub
+    CreatRepositoryCrazyAddonsZipFile
     UnzipAddonFile
     CreatAddOnXMLFile "./AddOnRepo"
     CopyFileToPublicGitHub
@@ -204,8 +242,14 @@ if [ -n $1 ]; then
     git status
     cd ../../
     PushPublicGitHub
-elif [ "$1" == "updatapublic" ]; then
-    echo ""
+elif [ "$1" = "pushpublic" ]; then
+    echo "更新外网github库"
+    PushPublicGitHub
+elif [ "$1" = "cr" ]; then
+    echo "CreatRepositoryCrazyAddonsZipFile"
+    CreatRepositoryCrazyAddonsZipFile
+else
+    ErrorMessage
 fi
 exit
 
